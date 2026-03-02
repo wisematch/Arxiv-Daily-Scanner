@@ -9,14 +9,28 @@ from email.header import Header
 genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 model = genai.GenerativeModel('gemini-3-flash-preview') # 使用 Flash 模型，速度快且免费
 
-# 2. 定义你的研究兴趣 (System Prompt)
-RESEARCH_INTEREST = """
-我关注的研究方向是：
-1. 人体姿态估计。
-2. 对抗攻击。
-3. 对抗防御。
-请从以下论文中筛选出符合我关注方向的论文，并说明推荐理由。
+
+# Prompt
+PROMPT_TEMPLATE = """
+你是一位顶尖的 AI 首席科学家。请分析以下今日最新的 ArXiv 论文列表，并生成一份 HTML 格式的学术简报。
+
+### 你的任务：
+1. **总体研究风向分析**：基于今日所有论文的标题和摘要，总结出 2-3 条当前 CV 领域的最新研究趋势或热点转向（例如：从单纯的生成转向可控性、具身智能的物理对齐等）。
+2. **论文精选（我的兴趣：{interest}）**：从列表中筛选出最符合我兴趣的论文。
+3. **输出格式**：必须输出完整的 HTML 代码，包含简单的 CSS 样式（如表格边框、背景色、字体等），确保在邮件客户端中显示美观。
+
+### HTML 结构要求：
+- 使用 <h2> 标题展示“今日风向趋势”。
+- 使用 <table> 展示精选论文，列包含：标题、核心亮点（1句话）、推荐分（1-10）、链接。
+- 整体风格简洁、学术、专业。
+
+### 待处理论文列表：
+{papers_text}
 """
+
+
+# 2. 定义你的研究兴趣 (System Prompt)
+RESEARCH_INTEREST = "人体姿态估计、对抗攻击与防御、多目标跟踪"
 
 def get_latest_papers(query="cat:cs.CV", max_results=30):
     client = arxiv.Client()
@@ -67,7 +81,7 @@ def send_email(content):
         print(f"邮件推送失败: {e}")
 
 def screen_papers_with_gemini(papers_text):
-    prompt = f"{RESEARCH_INTEREST}\n\n以下是今日待筛选论文：\n\n{papers_text}"
+    prompt = PROMPT_TEMPLATE.format(interest=RESEARCH_INTEREST, papers_text=latest_content)
     response = model.generate_content(prompt)
     return response.text
 
