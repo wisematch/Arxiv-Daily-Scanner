@@ -32,26 +32,37 @@ def get_latest_papers(query="cat:cs.CV", max_results=30):
         paper_list.append(paper_info)
     return "\n\n---\n\n".join(paper_list)
 
+
+
+    # try:
+    #     # 使用 SSL 加密连接
+    #         server = smtplib.SMTP(smtp_server, 587)
+    #         server.starttls() # 启用 TLS 加密
+    #         server.login(sender, password)
+    #         server.sendmail(sender, [receiver], message.as_string())
+    #         server.quit()
+    #         print("邮件推送成功！")
+    # except Exception as e:
+    #     print(f"邮件推送失败: {e}")
+
 def send_email(content):
-    # 从环境变量读取配置
-    sender = os.environ["EMAIL_SENDER"]        # 发件人邮箱，如 xxx@qq.com
-    password = os.environ["EMAIL_PASSWORD"]    # 刚才生成的授权码
-    receiver = os.environ["EMAIL_RECEIVER"]    # 收件人邮箱（可以和发件人一样）
-    smtp_server = "smtp.qq.com"                # QQ邮箱服务器，163为 smtp.163.com
+    sender = os.environ["EMAIL_SENDER"]      # 必须是 xxx@qq.com
+    password = os.environ["EMAIL_PASSWORD"]  # 16位授权码
+    receiver = os.environ["EMAIL_RECEIVER"]
+    smtp_server = "smtp.qq.com"
 
     message = MIMEText(content, 'plain', 'utf-8')
-    message['From'] = Header("Gemini 学术助手", 'utf-8')
-    message['To'] = Header("我的导师", 'utf-8')
+    
+    message['From'] = f"Gemini Academic Assistant <{sender}>"
+    message['To'] = receiver
     message['Subject'] = Header("今日 Arxiv 论文精选报告", 'utf-8')
 
     try:
-        # 使用 SSL 加密连接
-            server = smtplib.SMTP(smtp_server, 587)
-            server.starttls() # 启用 TLS 加密
+        # 建议继续使用 465 端口和 SMTP_SSL，这对 QQ 邮箱最稳定
+        with smtplib.SMTP_SSL(smtp_server, 465) as server:
             server.login(sender, password)
             server.sendmail(sender, [receiver], message.as_string())
-            server.quit()
-            print("邮件推送成功！")
+        print("邮件推送成功！")
     except Exception as e:
         print(f"邮件推送失败: {e}")
 
