@@ -46,7 +46,7 @@ def send_email(content):
 
     try:
         # 使用 SSL 加密连接
-        with smtplib.SMTP_SSL(smtp_server, 465) as server:
+        with smtplib.SMTP_SSL(smtp_server, 587) as server:
             server.login(sender, password)
             server.sendmail(sender, [receiver], message.as_string())
         print("邮件推送成功！")
