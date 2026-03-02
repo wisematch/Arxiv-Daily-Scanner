@@ -88,8 +88,7 @@ def screen_papers_with_gemini(papers_text):
 if __name__ == "__main__":
     latest_content = get_latest_papers("cat:cs.CV", max_results=40) # 获取 CV 领域前 40 篇
     report = screen_papers_with_gemini(latest_content)
-    html_report = response.text
-    if "```html" in html_report:
-        html_report = html_report.split("```html")[1].split("```")[0]
-    send_email(html_report)
+    if "```html" in report:
+        report = report.split("```html")[1].split("```")[0]
+    send_email(report)
     
