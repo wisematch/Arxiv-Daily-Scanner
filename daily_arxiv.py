@@ -65,14 +65,13 @@ def send_email(content):
     receiver = os.environ["EMAIL_RECEIVER"]
     smtp_server = "smtp.qq.com"
 
-    message = MIMEText(content, 'plain', 'utf-8')
+    message = MIMEText(content, 'html', 'utf-8')
     
     message['From'] = f"Gemini Academic Assistant <{sender}>"
     message['To'] = receiver
     message['Subject'] = Header("今日 Arxiv 论文精选报告", 'utf-8')
 
     try:
-        # 建议继续使用 465 端口和 SMTP_SSL，这对 QQ 邮箱最稳定
         with smtplib.SMTP_SSL(smtp_server, 465) as server:
             server.login(sender, password)
             server.sendmail(sender, [receiver], message.as_string())
@@ -87,12 +86,10 @@ def screen_papers_with_gemini(papers_text):
 
 # 执行流程
 if __name__ == "__main__":
-    print("正在从 ArXiv 获取最新论文...")
-    latest_content = get_latest_papers("cat:cs.CV", max_results=30) # 获取 CV 领域前 30 篇
-    
-    print("正在调用 Gemini 进行智能筛选...")
+    latest_content = get_latest_papers("cat:cs.CV", max_results=40) # 获取 CV 领域前 40 篇
     report = screen_papers_with_gemini(latest_content)
+    html_report = response.text
+    if "```html" in html_report:
+        html_report = html_report.split("```html")[1].split("```")[0]
+    send_email(html_report)
     
-    print("\n==== 每日论文精选报告 ====\n")
-    print(report)
-    send_email(report)
