@@ -30,7 +30,7 @@ PROMPT_TEMPLATE = """
 
 
 # 2. 定义你的研究兴趣 (System Prompt)
-RESEARCH_INTEREST = "人体姿态估计、对抗攻击与防御、多目标跟踪"
+RESEARCH_INTEREST = "具身智能、6维物体姿态估计、对抗攻击与防御、世界模型、物体抓取、多目标跟踪"
 
 def get_latest_papers(query="cat:cs.CV", max_results=30):
     client = arxiv.Client()
@@ -86,7 +86,7 @@ def screen_papers_with_gemini(papers_text):
 
 # 执行流程
 if __name__ == "__main__":
-    latest_content = get_latest_papers("cat:cs.CV", max_results=40) # 获取 CV 领域前 40 篇
+    latest_content = get_latest_papers("cat:cs.CV", max_results=100) # 获取 CV 领域前 100 篇
     report = screen_papers_with_gemini(latest_content)
     if "```html" in report:
         report = report.split("```html")[1].split("```")[0]
